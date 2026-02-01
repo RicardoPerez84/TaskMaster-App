@@ -11,31 +11,40 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
+
+    # PASSO NOVO: Instala o Java (Obrigatório para Android)
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
 
     - name: Setup Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.11'
 
-    - name: Install Dependencies
-      run: |
-        pip install flet
-        pip install -r requirements.txt
-
+    # Versão mais recente do Flutter para evitar erros
     - name: Setup Flutter
       uses: subosito/flutter-action@v2
       with:
-        flutter-version: '3.19.x'
+        flutter-version: '3.22.x'
 
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flet
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+    # Comando de construção detalhado
     - name: Flet Build APK
       run: |
         flet build apk --verbose
 
-    # AQUI ESTÁ A CORREÇÃO:
-    # Em vez de procurar numa pasta especifica, ele pega qualquer arquivo .apk
+    # Caçador de APK (Acha o arquivo onde ele estiver)
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: TaskMaster_V10
+        name: TaskMaster_APK
         path: "**/*.apk"
