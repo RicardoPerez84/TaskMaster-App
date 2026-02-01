@@ -13,11 +13,11 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    # PASSO NOVO: Instala o Java (Obrigatório para Android)
+    # Usa o Java 17 (Padrão ouro para Android atual)
     - name: Setup Java
       uses: actions/setup-java@v4
       with:
-        distribution: 'temurin'
+        distribution: 'zulu'
         java-version: '17'
 
     - name: Setup Python
@@ -25,11 +25,12 @@ jobs:
       with:
         python-version: '3.11'
 
-    # Versão mais recente do Flutter para evitar erros
+    # AQUI ESTÁ A CORREÇÃO: Usar canal 'stable' baixa o Flutter mais recente
+    # compatível com o Flet mais recente.
     - name: Setup Flutter
       uses: subosito/flutter-action@v2
       with:
-        flutter-version: '3.22.x'
+        channel: 'stable'
 
     - name: Install Dependencies
       run: |
@@ -37,14 +38,14 @@ jobs:
         pip install flet
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-    # Comando de construção detalhado
+    # Constrói o APK
     - name: Flet Build APK
       run: |
         flet build apk --verbose
 
-    # Caçador de APK (Acha o arquivo onde ele estiver)
+    # Encontra o APK onde quer que ele tenha sido salvo
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: TaskMaster_APK
+        name: TaskMaster_APK_Final
         path: "**/*.apk"
